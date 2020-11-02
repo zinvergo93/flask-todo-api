@@ -25,7 +25,7 @@ class TodoSchema(ma.Schema):
         fields = ("id", "title", "done")
 
 todo_schema = TodoSchema()
-todos_schea = TodoSchema(many=True)
+todos_schema = TodoSchema(many=True)
 
 @app.route("/")
 def hello():
@@ -42,6 +42,11 @@ def add_todo():
     todo = Todo.query.get(new_todo.id)
     return todo_schema.jsonify(todo)
 
+@app.route('/api/get-all-todos', methods=['GET'])
+def get_todos():
+    all_todos = Todo.query.all()
+    result = todos_schema.dump(all_todos)
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.debug = True

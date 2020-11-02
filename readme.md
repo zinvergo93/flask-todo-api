@@ -11,7 +11,6 @@
 
 ## TODO:
 - Create Routes
-    - Create a todo
     - Get all todos
     - Edit a single todo 'DONE property'
     - Delete a single todo
