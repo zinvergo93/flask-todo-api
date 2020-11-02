@@ -15,5 +15,4 @@
     - Get all todos
     - Edit a single todo 'DONE property'
     - Delete a single todo
-- Create Todo class
 - Host the api on Heroku
