@@ -11,6 +11,5 @@
 
 ## TODO:
 - Create Routes
-    - Edit a single todo 'DONE property'
     - Delete a single todo
 - Host the api on Heroku
