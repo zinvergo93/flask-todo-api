@@ -1,14 +1,19 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_cors import CORS
+from flask_heroku import Heroku
 import os
 
 app = Flask(__name__)
-
+heroku = Heroku(app)
+CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
 
 class Todo(db.Model):
     __tablename = "todos"
@@ -20,18 +25,22 @@ class Todo(db.Model):
         self.title = title
         self.done = done
 
+
 class TodoSchema(ma.Schema):
     class Meta:
         fields = ("id", "title", "done")
 
+
 todo_schema = TodoSchema()
 todos_schema = TodoSchema(many=True)
+
 
 @app.route("/")
 def hello():
     return "Hello, world!"
 
-@app.route('/api/create-todo', methods= ['POST'])
+
+@app.route('/api/create-todo', methods=['POST'])
 def add_todo():
     title = request.json['title']
     done = request.json['done']
@@ -42,11 +51,13 @@ def add_todo():
     todo = Todo.query.get(new_todo.id)
     return todo_schema.jsonify(todo)
 
+
 @app.route('/api/get-all-todos', methods=['GET'])
 def get_todos():
     all_todos = Todo.query.all()
     result = todos_schema.dump(all_todos)
     return jsonify(result)
+
 
 @app.route('/api/edit-todo/<id>', methods=['PATCH'])
 def edit_todo(id):
@@ -56,12 +67,14 @@ def edit_todo(id):
     db.session.commit()
     return todo_schema.jsonify(todo)
 
+
 @app.route('/api/delete-todo/<id>', methods=['DELETE'])
 def delete_todo(id):
     todo = Todo.query.get(id)
     db.session.delete(todo)
     db.session.commit()
     return jsonify('TODO deleted')
+
 
 if __name__ == "__main__":
     app.debug = True
